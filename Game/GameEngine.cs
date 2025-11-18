@@ -6,7 +6,7 @@ namespace TetrisAvalonia.Game;
 public class GameEngine
 {
     private readonly DispatcherTimer _timer;
-    private Grid Grid { get; }
+    public Grid Grid { get; }
     public Tetrimino Active { get; private set; }
     
     public event Action? StateChanged;
@@ -45,4 +45,41 @@ public class GameEngine
         Active.X = 3;
         Active.Y = 0;
     }
+
+    public void MoveLeft()
+    {
+        if (Grid.CanMoveHorizontally(Active, -1))
+        {
+            Active.X--;
+        }
+    }
+
+    public void FastForward()
+    {
+        if (Grid.CanMoveDown(Active))
+        {
+            Active.Y++;
+            _timer.Tick += (_, _) => Tick();
+        }
+    }
+    public void MoveRight(){}
+    
+    public void Rotate(){}
+
+    private bool ShouldDropInstantly()
+    {
+        if (Grid.CanMoveDown(Active))
+        {
+            Active.Y++;
+            return true;
+        }
+        return false;
+    }
+    
+    public void InstantDrop()
+    {
+        ShouldDropInstantly();
+    }
+    
+    public void SaveTetromino(){}
 }

@@ -43,8 +43,81 @@ public class Grid
                 return false;
             }
         }
-        return true;
+        return true; 
     }
     
     public int this[int y, int x] =>  _cells[y, x];
+
+
+    public int ClearFullLines()
+    {
+        int cleared = 0;
+        for (int y = Rows - 1; y >= 0; y--)
+        {
+            bool full = true;
+            for (int x = 0; x < Cols; x++)
+            {
+                if (_cells[y, x] == 0)
+                {
+                    full = false;
+                    break;
+                }
+            }
+
+            if (full)
+            {
+                cleared++;
+                RemoveLine(y);
+                y++;
+            }
+        }
+        return cleared;
+    }
+
+    private void RemoveLine(int row)
+    {
+        for (int y = 0; y < row; y--)
+        {
+            for (int x = 0; x < Cols; x++)
+            {
+                _cells[y, x] = _cells[y, x] - 1;
+            }
+        }
+
+        for (int x = 0; x < Cols; x++)
+        {
+            _cells[0, x] = 0;
+        }
+    }
+
+    public bool CanMoveHorizontally(Tetrimino t, int directionX)
+    {
+        foreach (var (px, py) in t.OccupiedCells())
+        {
+            int newX = t.X + px +  directionX;
+            int newY = t.Y + py;
+
+            if (!IsInside(newX, newY) || !IsEmpty(newX, newY))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public bool Collision(Tetrimino tetrimino)
+    {
+        foreach (var (px, py) in tetrimino.OccupiedCells())
+        {
+            var newX = tetrimino.X + px;
+            var newY = tetrimino.Y + py;
+
+            if (!IsInside(newX, newY) || !IsEmpty(newX, newY))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 }
