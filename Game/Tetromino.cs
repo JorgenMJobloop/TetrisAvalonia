@@ -3,14 +3,14 @@ using System.Collections.Generic;
 
 namespace TetrisAvalonia.Game;
 
-public class Tetrimino
+public class Tetromino
 {
     public int X {get; set;}
     public int Y {get; set;}
     
     public int[,] Shape { get; private set; }
 
-    private Tetrimino(int[,] shape)
+    private Tetromino(int[,] shape)
     {
         Shape = shape;
     }
@@ -32,6 +32,21 @@ public class Tetrimino
         Shape = rotated;
     }
 
+    public Tetromino Clone()
+    {
+        var rows = Shape.GetLength(0);
+        var cols = Shape.GetLength(1);
+
+        var cloneShape = new int[rows, cols];
+        Array.Copy(Shape, cloneShape, Shape.Length);
+
+        return new Tetromino(cloneShape)
+        {
+            X = this.X,
+            Y = this.Y,
+        };
+    }
+
     public IEnumerable<(int x, int y)> OccupiedCells()
     {
         for (var y = 0; y < Shape.GetLength(0); y++)
@@ -46,14 +61,25 @@ public class Tetrimino
         }
     }
 
-    public static Tetrimino CreateRandom()
+    public static Tetromino CreateRandom()
     {
-        var list = new[]
+        var shapes  = new List<int[,]>
         {
-            new[,]{{1,1,1,1}},
-            new[,]{{1,1},{1,1}},
-            new[,]{{0,1,0},{1,1,1}},
+            new int[,]{{1,1,1,1}}, // I
+            
+            new int[,]{{1,1},{1,1}}, // O
+            
+            new int[,]{{0,1,0},{1,1,1}}, // T
+            
+            new int[,]{{1,0,0},{1,1,1}}, // J
+            
+            new int[,]{{0,0,1},{1,1,1}}, // L
+            
+            new int[,]{{0,1,1},{1,1,0}}, // S
+            
+            new int[,]{{1,1,0},{0,1,1}}, // Z
         };
-        return new Tetrimino(list[new Random().Next(list.Length)]);
+        var index = Random.Shared.Next(shapes.Count);
+        return new Tetromino(shapes[index]);
     }
 }

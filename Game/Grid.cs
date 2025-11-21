@@ -23,7 +23,7 @@ public class Grid
         return IsInside(x, y) && _cells[x, y] == 0;
     }
 
-    public void Merge(Tetrimino t)
+    public void Merge(Tetromino t)
     {
         foreach (var (px, py) in t.OccupiedCells())
         {
@@ -31,12 +31,12 @@ public class Grid
         }
     }
 
-    public bool CanMoveDown(Tetrimino tetrimino)
+    public bool CanMoveDown(Tetromino tetromino)
     {
-        foreach (var (px, py) in tetrimino.OccupiedCells())
+        foreach (var (px, py) in tetromino.OccupiedCells())
         {
-            var newX = tetrimino.X + px;
-            var newY = tetrimino.Y + py;
+            var newX = tetromino.X + px;
+            var newY = tetromino.Y + py;
 
             if (!IsInside(newX, newY) || IsEmpty(newX, newY))
             {
@@ -90,7 +90,7 @@ public class Grid
         }
     }
 
-    public bool CanMoveHorizontally(Tetrimino t, int directionX)
+    public bool CanMoveHorizontally(Tetromino t, int directionX)
     {
         foreach (var (px, py) in t.OccupiedCells())
         {
@@ -106,12 +106,12 @@ public class Grid
         return true;
     }
 
-    public bool Collision(Tetrimino tetrimino)
+    public bool Collision(Tetromino tetromino)
     {
-        foreach (var (px, py) in tetrimino.OccupiedCells())
+        foreach (var (px, py) in tetromino.OccupiedCells())
         {
-            var newX = tetrimino.X + px;
-            var newY = tetrimino.Y + py;
+            var newX = tetromino.X + px;
+            var newY = tetromino.Y + py;
 
             if (!IsInside(newX, newY) || !IsEmpty(newX, newY))
             {
