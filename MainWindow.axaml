@@ -6,23 +6,28 @@
         mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="300"
         Width="400" Height="600"
         x:Class="TetrisAvalonia.MainWindow"
-        Background="#000e10"
+        Background="#001"
         Title="TetrisAvalonia">
-        <Grid ColumnDefinitions="100,200,100">
-                <StackPanel Background="Wheat" HorizontalAlignment="Left">
-                        <TextBlock>
-                                Score
-                        </TextBlock>
+        
+        <Grid ColumnDefinitions="100, *, 100">
+                <StackPanel Grid.Column="0"
+                            Background="WhiteSmoke"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            >
+                    <TextBlock Margin="8" Text="Score"></TextBlock>
                 </StackPanel>
-
-                <StackPanel Grid.Column="1">
+                
+                <Grid Grid.Column="1"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center">
                         <controls:GameCanvas x:Name="GameCanvas"/>
-                </StackPanel>
-                <StackPanel Grid.Column="2" HorizontalAlignment="Right" Background="Cyan">
-                        <TextBlock>
-                                Level
+                </Grid>
+                
+                <StackPanel Grid.Column="2" Background="White" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <TextBlock Margin="8" Text="Level">
+                                
                         </TextBlock>
                 </StackPanel>
         </Grid>
 </Window>
-

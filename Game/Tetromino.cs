@@ -8,13 +8,53 @@ public class Tetromino
     public int X {get; set;}
     public int Y {get; set;}
     
+    public int ColorId { get; }
+    
     public int[,] Shape { get; private set; }
 
-    private Tetromino(int[,] shape)
+    private Tetromino(int colorId,int[,] shape)
     {
+        ColorId = colorId;
         Shape = shape;
     }
 
+    public bool TryRotate(Grid grid)
+    {
+        var rows = Shape.GetLength(0);
+        var cols = Shape.GetLength(1);
+
+        var rotated = new int[cols, rows];
+        for (int y = 0; y < rows; y++)
+        {
+            for (int x = 0; x < cols; x++)
+            {
+                rotated[x, rows - 1 - y] = Shape[y, x];
+            }
+        }
+        
+        // do a collision check inside the grid
+        for (int y = 0; y < rotated.GetLength(0); y++)
+        {
+            for (int x = 0; x < rotated.GetLength(1); x++)
+            {
+                if (rotated[y, x] == 0)
+                {
+                    continue;
+                }
+
+                var gridX = X + x;
+                var gridY = Y + y;
+                if (!grid.IsInside(gridX, gridY) || !grid.IsEmpty(gridX, gridY))
+                {
+                    return false;
+                }
+            }
+        }
+
+        Shape = rotated;
+        return true;
+    }
+/*
     public void Rotate()
     {
         int rows = Shape.GetLength(0);
@@ -31,7 +71,7 @@ public class Tetromino
 
         Shape = rotated;
     }
-
+*/
     public Tetromino Clone()
     {
         var rows = Shape.GetLength(0);
@@ -40,7 +80,7 @@ public class Tetromino
         var cloneShape = new int[rows, cols];
         Array.Copy(Shape, cloneShape, Shape.Length);
 
-        return new Tetromino(cloneShape)
+        return new Tetromino(ColorId, cloneShape)
         {
             X = this.X,
             Y = this.Y,
@@ -63,23 +103,23 @@ public class Tetromino
 
     public static Tetromino CreateRandom()
     {
-        var shapes  = new List<int[,]>
+        var shapes  = new(int id, int[,] shape)[]
         {
-            new int[,]{{1,1,1,1}}, // I
+            (1,new int[,]{{1,1,1,1}}), // I
             
-            new int[,]{{1,1},{1,1}}, // O
+            (2,new int[,]{{1,1},{1,1}}), // O
             
-            new int[,]{{0,1,0},{1,1,1}}, // T
+            (3,new int[,]{{0,1,0},{1,1,1}}), // T
             
-            new int[,]{{1,0,0},{1,1,1}}, // J
+            (4,new int[,]{{1,0,0},{1,1,1}}), // J
             
-            new int[,]{{0,0,1},{1,1,1}}, // L
+            (5,new int[,]{{0,0,1},{1,1,1}}), // L
             
-            new int[,]{{0,1,1},{1,1,0}}, // S
+            (6,new int[,]{{0,1,1},{1,1,0}}), // S
             
-            new int[,]{{1,1,0},{0,1,1}}, // Z
+            (7,new int[,]{{1,1,0},{0,1,1}}), // Z
         };
-        var index = Random.Shared.Next(shapes.Count);
-        return new Tetromino(shapes[index]);
+        var choice = shapes[Random.Shared.Next(shapes.Length)];
+        return new Tetromino(choice.id, choice.shape);
     }
 }

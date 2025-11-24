@@ -34,18 +34,18 @@ public partial class MainWindow : Window
                 _engine.Rotate();
                 break;
             case Key.Down:
-                _engine.FastForward(); 
+                _engine.SoftDrop(); 
                 break;
             case Key.Space:
-                _engine.InstantDrop();
+                _engine.HardDrop();
                 break;
             case Key.Tab:
                 _engine.SaveTetromino();
                 break;
             case Key.Escape:
+                Close();
                 return;
         }
         GameCanvas.InvalidateVisual();
     }
-    
 }

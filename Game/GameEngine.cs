@@ -9,7 +9,7 @@ public class GameEngine
     public Grid Grid { get; }
     public Tetromino Active { get; private set; }
     public Tetromino? Saved { get; private set; }
-    private bool HasSavedTetromino = false;
+    private bool _hasSavedTetromino = false;
     public int Level { get; private set; } = 1;
     public int LinesCleared { get; private set; } = 0;
     public int Score { get; private set; } = 0;
@@ -25,6 +25,7 @@ public class GameEngine
             Interval = TimeSpan.FromMilliseconds(500)
         };
         _timer.Tick += (_, _) => Tick();
+        _timer.Start();
     }
     
     public void Start() =>  _timer.Start();
@@ -51,7 +52,12 @@ public class GameEngine
 
     private void Tick()
     {
-        if (!Grid.CanMoveDown(Active))
+        Console.WriteLine("TICK running..");
+        if (Grid.CanMoveDown(Active))
+        {
+            Active.Y++;
+        }
+        else
         {
             Grid.Merge(Active);
             var cleared = Grid.ClearFullLines();
@@ -62,7 +68,7 @@ public class GameEngine
                 UpdateLevelAndSpeed();
             }
 
-            HasSavedTetromino = false;
+            _hasSavedTetromino = false;
             Spawn();
         }
         StateChanged?.Invoke();
@@ -81,15 +87,7 @@ public class GameEngine
         {
             Active.X--;
         }
-    }
-
-    public void FastForward()
-    {
-        if (Grid.CanMoveDown(Active))
-        {
-            Active.Y++;
-            _timer.Tick += (_, _) => Tick();
-        }
+        StateChanged?.Invoke();
     }
 
     public void MoveRight()
@@ -98,42 +96,50 @@ public class GameEngine
         {
             Active.X++;
         }
+        StateChanged?.Invoke();
     }
 
     public void Rotate()
     {
-        Active.Rotate();
-        if (!Grid.Collision(Active))
+        if (Active.TryRotate(Grid))
         {
-            UndoRotate();
+            StateChanged?.Invoke();
         }
     }
 
-    private void UndoRotate()
-    {
-        Active.Rotate();   
-        Active.Rotate();
-        Active.Rotate();
-    }
-
-    private bool ShouldDropInstantly()
+    public void SoftDrop()
     {
         if (Grid.CanMoveDown(Active))
         {
             Active.Y++;
-            return true;
+            StateChanged?.Invoke();
         }
-        return false;
     }
-    
-    public void InstantDrop()
+
+    public void HardDrop()
     {
-        ShouldDropInstantly();
+        while (Grid.CanMoveDown(Active))
+        {
+            Active.Y++;
+        }
+        
+        Grid.Merge(Active);
+        var cleared = Grid.ClearFullLines();
+        if (cleared > 0)
+        {
+            LinesCleared += cleared;
+            AddScore(cleared);
+            UpdateLevelAndSpeed();
+        }
+        
+        _hasSavedTetromino = false;
+        Spawn();
+        StateChanged?.Invoke();
     }
 
     public void SaveTetromino()
     {
-        if (HasSavedTetromino)
+        if (_hasSavedTetromino)
         {
             return;
         }
@@ -152,7 +158,7 @@ public class GameEngine
             Saved = temp;
         }
         
-        HasSavedTetromino = true;
+        _hasSavedTetromino = true;
         StateChanged?.Invoke();
     }
 }
