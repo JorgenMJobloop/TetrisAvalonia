@@ -54,24 +54,7 @@ public class Tetromino
         Shape = rotated;
         return true;
     }
-/*
-    public void Rotate()
-    {
-        int rows = Shape.GetLength(0);
-        int cols = Shape.GetLength(1);
-        var rotated = new int[rows, cols];
 
-        for (int y = 0; y < rows; y++)
-        {
-            for (int x = 0; x < cols; x++)
-            {
-                rotated[x, rows - 1 - y] = Shape[y, x];
-            }
-        }
-
-        Shape = rotated;
-    }
-*/
     public Tetromino Clone()
     {
         var rows = Shape.GetLength(0);

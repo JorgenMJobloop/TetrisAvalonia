@@ -13,6 +13,7 @@ public class GameEngine
     public int Level { get; private set; } = 1;
     public int LinesCleared { get; private set; } = 0;
     public int Score { get; private set; } = 0;
+    public event Action? OnGameOver;
     
     public event Action? StateChanged;
 
@@ -52,7 +53,6 @@ public class GameEngine
 
     private void Tick()
     {
-        Console.WriteLine("TICK running..");
         if (Grid.CanMoveDown(Active))
         {
             Active.Y++;
@@ -79,6 +79,20 @@ public class GameEngine
         Active = Tetromino.CreateRandom();
         Active.X = 3;
         Active.Y = 0;
+        
+        // Add game over state
+        foreach (var (px, py) in Active.OccupiedCells())
+        {
+            var gx = Active.X + px;
+            var gy = Active.Y + py;
+
+            if (!Grid.IsEmpty(gx, gy))
+            {
+                Stop();
+                OnGameOver?.Invoke();
+                return;
+            }
+        }
     }
     
     public void MoveLeft()

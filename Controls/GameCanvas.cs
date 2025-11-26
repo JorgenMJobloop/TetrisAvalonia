@@ -44,7 +44,7 @@ public class GameCanvas : Control
                 new Point(BoardOffsetX + grid.Cols * CellSize, BoardOffsetY + y * CellSize));
         }
 
-        for (int x = 0; x < grid.Cols; x++)
+        for (int x = 0; x <= grid.Cols; x++)
         {
             context.DrawLine(pen, 
                 new Point(BoardOffsetX + x * CellSize, BoardOffsetY), 
@@ -59,7 +59,16 @@ public class GameCanvas : Control
                 int v = grid[y, x];
                 if (v != 0)
                 {
-                    context.DrawRectangle(GetBrush(v), null, new Rect(BoardOffsetX + x * CellSize, BoardOffsetY + y * CellSize, CellSize, CellSize));
+                    var rect = new Rect(
+                        BoardOffsetX + x * CellSize,
+                        BoardOffsetY + y * CellSize,
+                        CellSize,
+                        CellSize
+                        );
+                    // fill
+                    context.DrawRectangle(GetBrush(v), null, rect);
+                    // border
+                    context.DrawRectangle(null, new Pen(Brushes.Black, 1), rect);
                 }
             }
         }
@@ -68,15 +77,30 @@ public class GameCanvas : Control
         {
             var gx = Engine.Active.X + px;
             var gy = Engine.Active.Y + py;
+        
+            var rect = new Rect(BoardOffsetX + gx * CellSize, BoardOffsetY + gy * CellSize, CellSize, CellSize);
+
+            context.DrawRectangle(GetBrush(Engine.Active.ColorId), null, rect);
             
-            context.DrawRectangle(GetBrush(Engine.Active.ColorId), null, new Rect(BoardOffsetX + gx * CellSize, BoardOffsetY + gy * CellSize, CellSize, CellSize));
+            // Grid border
+            context.DrawRectangle(null, new Pen(Brushes.Black, 1), rect);
         }
 
         if (Engine.Saved is not null)
         {
             foreach (var (px, py) in Engine.Saved.OccupiedCells())
             {
-                context.DrawRectangle(GetBrush(Engine.Saved.ColorId), null, new Rect(BoardOffsetX + grid.Cols * CellSize + 30 + px * CellSize, BoardOffsetY + 30 + py * CellSize, CellSize, CellSize));
+
+                var rect = new Rect(
+                    BoardOffsetX + grid.Cols * CellSize + 30 + px * CellSize,
+                    BoardOffsetY + 30 + py * CellSize,
+                    CellSize,
+                    CellSize
+                    );
+                
+                context.DrawRectangle(GetBrush(Engine.Saved.ColorId), null, rect);
+                // border
+                context.DrawRectangle(null, new Pen(Brushes.Black, 1), rect);
             }
         }
     }

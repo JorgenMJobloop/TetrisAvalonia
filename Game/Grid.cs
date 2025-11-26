@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace TetrisAvalonia.Game;
 
 public class Grid
@@ -19,15 +21,13 @@ public class Grid
     }
 
     public bool IsEmpty(int x, int y)
-    {
-        return IsInside(x, y) && _cells[x, y] == 0;
-    }
+        => _cells[y, x] == 0; 
 
     public void Merge(Tetromino t)
     {
         foreach (var (px, py) in t.OccupiedCells())
         {
-            _cells[t.Y + py, t.X + px] = 1;
+            _cells[t.Y + py, t.X + px] = t.ColorId;
         }
     }
 
@@ -36,9 +36,9 @@ public class Grid
         foreach (var (px, py) in tetromino.OccupiedCells())
         {
             var newX = tetromino.X + px;
-            var newY = tetromino.Y + py;
+            var newY = tetromino.Y + py + 1;
 
-            if (!IsInside(newX, newY) || IsEmpty(newX, newY))
+            if (!IsInside(newX, newY) || !IsEmpty(newX, newY))
             {
                 return false;
             }
@@ -47,6 +47,31 @@ public class Grid
     }
     
     public int this[int y, int x] =>  _cells[y, x];
+
+    public int[] GetFullLines()
+    {
+        var lines = new List<int>();
+
+        for (var y = 0; y < Rows; y++)
+        {
+            bool full = true;
+            for (var x = 0; x < Cols; x++)
+            {
+                if (_cells[y, x] == 0)
+                {
+                    full = false;
+                    break;
+                }
+            }
+
+            if (full)
+            {
+                lines.Add(y);
+            }
+        }
+
+        return lines.ToArray();
+    }
 
 
     public int ClearFullLines()
@@ -76,15 +101,15 @@ public class Grid
 
     private void RemoveLine(int row)
     {
-        for (int y = 0; y < row; y--)
+        for (var y = row; y > 0; y--)
         {
-            for (int x = 0; x < Cols; x++)
+            for (var x = 0; x < Cols; x++)
             {
-                _cells[y, x] = _cells[y, x] - 1;
+                _cells[y,x] = _cells[y - 1, x];
             }
         }
 
-        for (int x = 0; x < Cols; x++)
+        for (var x = 0; x < Cols; x++)
         {
             _cells[0, x] = 0;
         }
@@ -94,7 +119,7 @@ public class Grid
     {
         foreach (var (px, py) in t.OccupiedCells())
         {
-            int newX = t.X + px +  directionX;
+            int newX = t.X + px + directionX;
             int newY = t.Y + py;
 
             if (!IsInside(newX, newY) || !IsEmpty(newX, newY))

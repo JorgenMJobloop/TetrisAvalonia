@@ -1,5 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Media;
+using Avalonia.Threading;
 using TetrisAvalonia.Game;
 
 namespace TetrisAvalonia;
@@ -17,7 +19,29 @@ public partial class MainWindow : Window
         
         KeyDown += OnKeyDown;
         
-        _engine.Start();
+        Opened += (_,_) => _engine.Start();
+
+        _engine.OnGameOver += () =>
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                var dlg = new Window
+                {
+                    Width = 300,
+                    Height = 150,
+                    Background = Brushes.Black,
+                    Content = new TextBlock
+                    {
+                        Text = "Game Over",
+                        Foreground = Brushes.Red,
+                        HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+                        VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
+                        FontSize = 32
+                    }
+                };
+                dlg.ShowDialog(this);
+            });
+        };
     }
 
     private void OnKeyDown(object? sender, KeyEventArgs e)
